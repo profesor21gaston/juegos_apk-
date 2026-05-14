@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo Euclides</title>
+    <style>
+        :root {
+            --neon-green: #008f7a;
+            --neon-red: #a30036;
+            --neon-blue: #007acc;
+            --bg-dark: #0a0a0a;
+            --panel-bg: #121212;
+            --text-gray: #b0b0b0;
+            --cell-empty: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-gray);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: var(--panel-bg);
+            padding: 20px;
+            border-top: 3px solid var(--neon-green);
+            border-radius: 12px;
+            width: 95%;
+            max-width: 400px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 { font-size: 1.2rem; letter-spacing: 2px; color: var(--neon-green); margin-top: 0; text-transform: uppercase; }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            color: white;
+            border: 1px solid #333;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            outline: none;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        #pregunta {
+            font-size: 42px;
+            color: white;
+            margin: 15px 0;
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px inset #222;
+        }
+
+        .btn-main {
+            background-color: var(--neon-green);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-main:active { transform: scale(0.98); }
+
+        .pistas-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+        }
+
+        .btn-pista {
+            background: #1a1a1a;
+            color: var(--text-gray);
+            border: 1px solid #444;
+            padding: 10px 5px;
+            border-radius: 6px;
+            font-size: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-pista span { font-size: 32px; }
+        .btn-pista:hover { border-color: var(--neon-blue); color: white; }
+
+        .progreso-container {
+            background: var(--panel-bg);
+            padding: 15px;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+
+        .footer-creditos {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            font-size: 10px;
+            color: #555;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-top: 1px solid #222;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .footer-creditos span { color: var(--neon-green); }
+
+        h3 { font-size: 0.8rem; color: var(--text-gray); text-transform: uppercase; margin-bottom: 10px; }
+
+        .grid-tablas {
+            display: grid;
+            grid-template-columns: repeat(11, 1fr);
+            gap: 2px;
+            background: #222;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .cell {
+            aspect-ratio: 1/1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 9px;
+            background: var(--cell-empty);
+            color: transparent;
+            transition: all 0.5s ease;
+        }
+
+        .cell.header { background: #000; color: var(--neon-green) !important; font-weight: bold; }
+        .cell.unlocked { background: var(--neon-green); color: white !important; }
+
+        .btn-clear {
+            background: transparent;
+            color: var(--neon-red);
+            border: 1px solid var(--neon-red);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+
+        #status-display { height: 20px; font-size: 0.8rem; margin-bottom: 5px; transition: 0.3s; }
+        .reaction-correct { color: var(--neon-green); }
+        .reaction-error { color: var(--neon-red); }
+        .reaction-info { color: var(--neon-blue); }
+    </style>
+</head>
+<body onload="inicializarApp()">
+
+    <div class="container">
+        <h1>PROTOCOLO EUCLIDES</h1>
+        
+        <select id="modo" onchange="reiniciarLogica()">
+            <option value="aleatorio">MODO: ALEATORIO (Global)</option>
+            <option value="orden">MODO: SECUENCIAL</option>
+        </select>
+
+        <select id="tabla" onchange="reiniciarLogica()" style="display:none;">
+            <option value="2">TABLA DEL 2</option>
+            <option value="3">TABLA DEL 3</option>
+            <option value="4">TABLA DEL 4</option>
+            <option value="5">TABLA DEL 5</option>
+            <option value="6">TABLA DEL 6</option>
+            <option value="7">TABLA DEL 7</option>
+            <option value="8">TABLA DEL 8</option>
+            <option value="9">TABLA DEL 9</option>
+        </select>
+
+        <div id="status-display">SISTEMA ONLINE</div>
+        <div id="pregunta">-- x --</div>
+        
+        <input type="number" id="inputRespuesta" inputmode="numeric" placeholder="Resultado" onkeypress="if(event.key==='Enter') verificarRespuesta()">
+        <button class="btn-main" onclick="verificarRespuesta()">VERIFICAR</button>
+        
+        <div class="pistas-container">
+            <button class="btn-pista" onclick="pistaCambiarPregunta()">
+                <span>🔄</span> Saltar
+            </button>
+            <button class="btn-pista" onclick="pistaConsultarCompanero()">
+                <span>👥</span> Consultar
+            </button>
+            <button class="btn-pista" onclick="pistaCambiarRoles()">
+                <span>🎮</span> Relevo
+            </button>
+        </div>
+    </div>
+
+    <div class="progreso-container">
+        <h3>MAPA DE PROGRESO GUARDADO</h3>
+        <div id="matrizProgreso" class="grid-tablas"></div>
+        <button class="btn-clear" onclick="limpiarTodo()">LIMPIAR TODO EL PROGRESO</button>
+    </div>
+
+    <div class="footer-creditos">
+        &copy; 2026 Protocolo Euclides <br>
+        Desarrollado por: <span>Franco Ropero, Gastón Ortíz</span>
+    </div>
+
+    <script>
+        let num1, num2, respuestaCorrecta;
+        let multiplicadorOrden = 1;
+        let progresoGuardado = [];
+
+        function inicializarApp() {
+            const datosLocal = localStorage.getItem('progresoMatematico');
+            if (datosLocal) {
+                progresoGuardado = JSON.parse(datosLocal);
+            }
+            crearMatriz();
+            reiniciarLogica();
+        }
+
+        function crearMatriz() {
+            const matriz = document.getElementById("matrizProgreso");
+            matriz.innerHTML = "";
+            matriz.appendChild(crearCelda("", "header"));
+            for(let i=1; i<=10; i++) matriz.appendChild(crearCelda(i, "header"));
+
+            for(let f=2; f<=9; f++) {
+                matriz.appendChild(crearCelda(f, "header"));
+                for(let c=1; c<=10; c++) {
+                    const id = `c-${f}-${c}`;
+                    const celda = crearCelda(f * c, "cell");
+                    celda.id = id;
+                    if (progresoGuardado.includes(id)) {
+                        celda.classList.add("unlocked");
+                    }
+                    matriz.appendChild(celda);
+                }
+            }
+        }
+
+        function crearCelda(texto, clase) {
+            const div = document.createElement("div");
+            div.className = clase;
+            div.innerText = texto;
+            return div;
+        }
+
+        function reiniciarLogica() {
+            const modo = document.getElementById("modo").value;
+            document.getElementById("tabla").style.display = (modo === "aleatorio") ? "none" : "block";
+            multiplicadorOrden = 1;
+            generarEjercicio();
+        }
+
+        function generarEjercicio() {
+            const modo = document.getElementById("modo").value;
+            if (modo === "aleatorio") {
+                num1 = Math.floor(Math.random() * 8) + 2;
+                num2 = Math.floor(Math.random() * 10) + 1;
+            } else {
+                num1 = parseInt(document.getElementById("tabla").value);
+                num2 = multiplicadorOrden;
+            }
+
+            respuestaCorrecta = num1 * num2;
+            document.getElementById("pregunta").innerText = `${num1} × ${num2}`;
+            const rInput = document.getElementById("inputRespuesta");
+            rInput.value = "";
+            rInput.focus();
+        }
+
+        function verificarRespuesta() {
+            const rInput = document.getElementById("inputRespuesta");
+            const status = document.getElementById("status-display");
+            const val = parseInt(rInput.value);
+
+            if (val === respuestaCorrecta) {
+                status.innerText = "¡SINCRONIZADO!";
+                status.className = "reaction-correct";
+                
+                const celdaId = `c-${num1}-${num2}`;
+                const celda = document.getElementById(celdaId);
+                if(celda) {
+                    celda.classList.add("unlocked");
+                    if (!progresoGuardado.includes(celdaId)) {
+                        progresoGuardado.push(celdaId);
+                        localStorage.setItem('progresoMatematico', JSON.stringify(progresoGuardado));
+                    }
+                }
+
+                if (document.getElementById("modo").value === "orden") {
+                    multiplicadorOrden++;
+                    if (multiplicadorOrden > 10) multiplicadorOrden = 1;
+                }
+                setTimeout(generarEjercicio, 800);
+            } else {
+                status.innerText = "ERROR DETECTADO";
+                status.className = "reaction-error";
+                rInput.value = "";
+                rInput.focus();
+            }
+        }
+
+        function pistaCambiarPregunta() {
+            const status = document.getElementById("status-display");
+            status.innerText = "REGENERANDO CÓDIGO...";
+            status.className = "reaction-info";
+            setTimeout(generarEjercicio, 500);
+        }
+
+        function pistaConsultarCompanero() {
+            const status = document.getElementById("status-display");
+            status.innerText = "CONSULTA EXTERNA ACTIVADA";
+            status.className = "reaction-info";
+            alert("SISTEMA: Gira y pregunta a un compañero cómo resolver " + num1 + " x " + num2);
+        }
+
+        function pistaCambiarRoles() {
+            const status = document.getElementById("status-display");
+            status.innerText = "TRANSFIRIENDO MANDO...";
+            status.className = "reaction-info";
+            alert("SISTEMA: ¡Es momento de un relevo! Pasale el dispositivo a un compañero para que resuelva esta operación.");
+        }
+
+        function limpiarTodo() {
+            if(confirm("¿Seguro que quieres borrar todo tu progreso guardado?")) {
+                localStorage.removeItem('progresoMatematico');
+                progresoGuardado = [];
+                crearMatriz();
+                document.getElementById("status-display").innerText = "MEMORIA BORRADA";
+            }
+        }
+    </script>
+</body>
+</html>
