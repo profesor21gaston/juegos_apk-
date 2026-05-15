@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    <link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo Euclides</title>
+    <!-- Vinculación del archivo CSS externo -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onload="inicializarApp()">
+
+    <!-- MODAL DE REGLAS -->
+    <div id="modalReglas" class="modal">
+        <div class="modal-content">
+            <h2>📜 REGLAS DEL PROTOCOLO</h2>
+            <ul>
+                <li><strong>OBJETIVO:</strong> Completar el Mapa de Progreso desbloqueando todas las celdas.</li>
+                <li><strong>SIN REPETICIÓN:</strong> El sistema detecta tus aciertos y no te volverá a preguntar lo que ya dominas.</li>
+                <li><strong>MODOS:</strong> 
+                    <br>• <i>Aleatorio:</i> Desafíos de cualquier tabla.
+                    <br>• <i>Secuencial:</i> Práctica enfocada en una tabla específica.
+                </li>
+                <li><strong>NOTA:</strong> El botón saltar solo funciona con las cuentas aleatorias no con la secuencial. </li>
+                <li><strong>AYUDAS:</strong> Usa los botones inferiores si te bloqueas. ¡El trabajo en equipo suma!</li>
+            </ul>
+            <button class="btn-main" style="background: var(--neon-blue);" onclick="toggleReglas()">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <button class="btn-info-toggle" onclick="toggleReglas()">?</button>
+        <h1>PROTOCOLO EUCLIDES</h1>
+        
+        <select id="modo" onchange="reiniciarLogica()">
+            <option value="aleatorio">MODO: ALEATORIO (Global)</option>
+            <option value="orden">MODO: SECUENCIAL</option>
+        </select>
+
+        <select id="tabla" onchange="reiniciarLogica()" style="display:none;">
+            <option value="2">TABLA DEL 2</option>
+            <option value="3">TABLA DEL 3</option>
+            <option value="4">TABLA DEL 4</option>
+            <option value="5">TABLA DEL 5</option>
+            <option value="6">TABLA DEL 6</option>
+            <option value="7">TABLA DEL 7</option>
+            <option value="8">TABLA DEL 8</option>
+            <option value="9">TABLA DEL 9</option>
+        </select>
+
+        <div id="status-display">SISTEMA ONLINE</div>
+        <div id="pregunta">-- x --</div>
+        
+        <input type="number" id="inputRespuesta" inputmode="numeric" placeholder="Resultado" onkeypress="if(event.key==='Enter') verificarRespuesta()">
+        <button class="btn-main" onclick="verificarRespuesta()">VERIFICAR</button>
+        
+        <div class="pistas-container">
+            <button class="btn-pista" onclick="pistaCambiarPregunta()">
+                <span>🔄</span> Saltar
+            </button>
+            <button class="btn-pista" onclick="pistaConsultarCompanero()">
+                <span>👥</span> Consultar
+            </button>
+            <button class="btn-pista" onclick="pistaCambiarRoles()">
+                <span>🎮</span> Relevo
+            </button>
+        </div>
+    </div>
+
+    <div class="progreso-container">
+        <h3>MAPA DE PROGRESO GUARDADO</h3>
+        <div id="matrizProgreso" class="grid-tablas"></div>
+        <button class="btn-clear" onclick="limpiarTodo()">LIMPIAR TODO EL PROGRESO</button>
+    </div>
+
+    <div class="footer-creditos">
+        &copy; 2026 Protocolo Euclides <br>
+        Desarrollado por: <span>Franco Ropero, Gastón Ortíz</span>
+    </div>
+
+    <!-- Vinculación del archivo JavaScript externo -->
+    <script src="script.js"></script>
+</body>
+</html>
+    <script  src="./script.js"></script>
+
+  </body>
+  
+</html>
