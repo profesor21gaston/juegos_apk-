@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo Euclides</title>
+    <style>
+        :root {
+            --neon-green: #008f7a;
+            --neon-red: #a30036;
+            --neon-blue: #007acc;
+            --bg-dark: #0a0a0a;
+            --panel-bg: #121212;
+            --text-gray: #b0b0b0;
+            --cell-empty: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-gray);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: var(--panel-bg);
+            padding: 20px;
+            border-top: 3px solid var(--neon-green);
+            border-radius: 12px;
+            width: 95%;
+            max-width: 400px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .btn-info-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #1a1a1a;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        h1 { font-size: 1.2rem; letter-spacing: 2px; color: var(--neon-green); margin-top: 0; text-transform: uppercase; }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            color: white;
+            border: 1px solid #333;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            outline: none;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        #pregunta {
+            font-size: 42px;
+            color: white;
+            margin: 15px 0;
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px inset #222;
+        }
+
+        .btn-main {
+            background-color: var(--neon-green);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-main:active { transform: scale(0.98); }
+
+        .pistas-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+        }
+
+        .btn-pista {
+            background: #1a1a1a;
+            color: var(--text-gray);
+            border: 1px solid #444;
+            padding: 10px 5px;
+            border-radius: 6px;
+            font-size: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-pista span { font-size: 32px; }
+        .btn-pista:hover { border-color: var(--neon-blue); color: white; }
+
+        .progreso-container {
+            background: var(--panel-bg);
+            padding: 15px;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos del Modal de Reglas */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--panel-bg);
+            padding: 25px;
+            border: 1px solid var(--neon-blue);
+            border-radius: 15px;
+            width: 85%;
+            max-width: 350px;
+            text-align: left;
+        }
+
+        .modal-content h2 { color: var(--neon-blue); font-size: 1rem; text-transform: uppercase; }
+        .modal-content ul { padding-left: 20px; font-size: 0.9rem; line-height: 1.6; }
+        .modal-content li { margin-bottom: 10px; }
+
+        .grid-tablas {
+            display: grid;
+            grid-template-columns: repeat(11, 1fr);
+            gap: 2px;
+            background: #222;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        .cell {
+            aspect-ratio: 1/1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 9px;
+            background: var(--cell-empty);
+            color: transparent;
+            transition: all 0.5s ease;
+        }
+
+        .cell.header { background: #000; color: var(--neon-green) !important; font-weight: bold; }
+        .cell.unlocked { background: var(--neon-green); color: white !important; }
+
+        .footer-creditos {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            font-size: 10px;
+            color: #555;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-top: 1px solid #222;
+            width: 100%;
+            max-width: 400px;
+        }
+        .footer-creditos span { color: var(--neon-green); }
+
+        .btn-clear {
+            background: transparent;
+            color: var(--neon-red);
+            border: 1px solid var(--neon-red);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+
+        #status-display { height: 20px; font-size: 0.8rem; margin-bottom: 5px; transition: 0.3s; }
+        .reaction-correct { color: var(--neon-green); }
+        .reaction-error { color: var(--neon-red); }
+        .reaction-info { color: var(--neon-blue); }
+    </style>
+</head>
+<body onload="inicializarApp()">
+
+    <!-- MODAL DE REGLAS -->
+    <div id="modalReglas" class="modal">
+        <div class="modal-content">
+            <h2>📜 REGLAS DEL PROTOCOLO</h2>
+            <ul>
+                <li><strong>OBJETIVO:</strong> Completar el Mapa de Progreso desbloqueando todas las celdas.</li>
+                <li><strong>SIN REPETICIÓN:</strong> El sistema detecta tus aciertos y no te volverá a preguntar lo que ya dominas.</li>
+                <li><strong>MODOS:</strong> 
+                    <br>• <i>Aleatorio:</i> Desafíos de cualquier tabla.
+                    <br>• <i>Secuencial:</i> Práctica enfocada en una tabla específica.
+                </li>
+                <li><strong>NOTA:</strong> El boton saltar solo funciona con las cuebtas aleatorias no con la secuencial. </li>
+                <li><strong>AYUDAS:</strong> Usa los botones inferiores si te bloqueas. ¡El trabajo en equipo suma!</li>
+            </ul>
+            </ul>
+            <button class="btn-main" style="background: var(--neon-blue);" onclick="toggleReglas()">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <button class="btn-info-toggle" onclick="toggleReglas()">?</button>
+        <h1>PROTOCOLO EUCLIDES</h1>
+        
+        <select id="modo" onchange="reiniciarLogica()">
+            <option value="aleatorio">MODO: ALEATORIO (Global)</option>
+            <option value="orden">MODO: SECUENCIAL</option>
+        </select>
+
+        <select id="tabla" onchange="reiniciarLogica()" style="display:none;">
+            <option value="2">TABLA DEL 2</option>
+            <option value="3">TABLA DEL 3</option>
+            <option value="4">TABLA DEL 4</option>
+            <option value="5">TABLA DEL 5</option>
+            <option value="6">TABLA DEL 6</option>
+            <option value="7">TABLA DEL 7</option>
+            <option value="8">TABLA DEL 8</option>
+            <option value="9">TABLA DEL 9</option>
+        </select>
+
+        <div id="status-display">SISTEMA ONLINE</div>
+        <div id="pregunta">-- x --</div>
+        
+        <input type="number" id="inputRespuesta" inputmode="numeric" placeholder="Resultado" onkeypress="if(event.key==='Enter') verificarRespuesta()">
+        <button class="btn-main" onclick="verificarRespuesta()">VERIFICAR</button>
+        
+        <div class="pistas-container">
+            <button class="btn-pista" onclick="pistaCambiarPregunta()">
+                <span>🔄</span> Saltar
+            </button>
+            <button class="btn-pista" onclick="pistaConsultarCompanero()">
+                <span>👥</span> Consultar
+            </button>
+            <button class="btn-pista" onclick="pistaCambiarRoles()">
+                <span>🎮</span> Relevo
+            </button>
+        </div>
+    </div>
+
+    <div class="progreso-container">
+        <h3>MAPA DE PROGRESO GUARDADO</h3>
+        <div id="matrizProgreso" class="grid-tablas"></div>
+        <button class="btn-clear" onclick="limpiarTodo()">LIMPIAR TODO EL PROGRESO</button>
+    </div>
+
+    <div class="footer-creditos">
+        &copy; 2026 Protocolo Euclides <br>
+        Desarrollado por: <span>Franco Ropero, Gastón Ortíz</span>
+    </div>
+
+    <script>
+        let num1, num2, respuestaCorrecta;
+        let progresoGuardado = [];
+
+        function inicializarApp() {
+            const datosLocal = localStorage.getItem('progresoMatematico');
+            if (datosLocal) {
+                progresoGuardado = JSON.parse(datosLocal);
+            }
+            crearMatriz();
+            reiniciarLogica();
+        }
+
+        function toggleReglas() {
+            const modal = document.getElementById("modalReglas");
+            modal.style.display = (modal.style.display === "flex") ? "none" : "flex";
+        }
+
+        function crearMatriz() {
+            const matriz = document.getElementById("matrizProgreso");
+            matriz.innerHTML = "";
+            matriz.appendChild(crearCelda("", "header"));
+            for(let i=1; i<=10; i++) matriz.appendChild(crearCelda(i, "header"));
+
+            for(let f=2; f<=9; f++) {
+                matriz.appendChild(crearCelda(f, "header"));
+                for(let c=1; c<=10; c++) {
+                    const id = `c-${f}-${c}`;
+                    const celda = crearCelda(f * c, "cell");
+                    celda.id = id;
+                    if (progresoGuardado.includes(id)) {
+                        celda.classList.add("unlocked");
+                    }
+                    matriz.appendChild(celda);
+                }
+            }
+        }
+
+        function crearCelda(texto, clase) {
+            const div = document.createElement("div");
+            div.className = clase;
+            div.innerText = texto;
+            return div;
+        }
+
+        function reiniciarLogica() {
+            const modo = document.getElementById("modo").value;
+            document.getElementById("tabla").style.display = (modo === "aleatorio") ? "none" : "block";
+            generarEjercicio();
+        }
+
+        function generarEjercicio() {
+            const modo = document.getElementById("modo").value;
+            let pendientes = [];
+
+            // Buscar combinaciones que NO estén en progresoGuardado
+            if (modo === "aleatorio") {
+                for (let f = 2; f <= 9; f++) {
+                    for (let c = 1; c <= 10; c++) {
+                        if (!progresoGuardado.includes(`c-${f}-${c}`)) {
+                            pendientes.push({n1: f, n2: c});
+                        }
+                    }
+                }
+            } else {
+                let f = parseInt(document.getElementById("tabla").value);
+                for (let c = 1; c <= 10; c++) {
+                    if (!progresoGuardado.includes(`c-${f}-${c}`)) {
+                        pendientes.push({n1: f, n2: c});
+                    }
+                }
+            }
+
+            // Si no hay más pendientes
+            if (pendientes.length === 0) {
+                document.getElementById("pregunta").innerText = "¡FIN!";
+                document.getElementById("status-display").innerText = "MAPA COMPLETADO AL 100%";
+                document.getElementById("status-display").className = "reaction-correct";
+                return;
+            }
+
+            // Elegir una de las pendientes al azar (o la primera si es modo orden)
+            let elegido = (modo === "aleatorio") 
+                ? pendientes[Math.floor(Math.random() * pendientes.length)]
+                : pendientes[0];
+
+            num1 = elegido.n1;
+            num2 = elegido.n2;
+            respuestaCorrecta = num1 * num2;
+
+            document.getElementById("pregunta").innerText = `${num1} × ${num2}`;
+            const rInput = document.getElementById("inputRespuesta");
+            rInput.value = "";
+            rInput.focus();
+        }
+
+        function verificarRespuesta() {
+            const rInput = document.getElementById("inputRespuesta");
+            const status = document.getElementById("status-display");
+            const val = parseInt(rInput.value);
+
+            if (val === respuestaCorrecta) {
+                status.innerText = "¡SINCRONIZADO!";
+                status.className = "reaction-correct";
+                
+                const celdaId = `c-${num1}-${num2}`;
+                const celda = document.getElementById(celdaId);
+                if(celda) {
+                    celda.classList.add("unlocked");
+                    if (!progresoGuardado.includes(celdaId)) {
+                        progresoGuardado.push(celdaId);
+                        localStorage.setItem('progresoMatematico', JSON.stringify(progresoGuardado));
+                    }
+                }
+                setTimeout(generarEjercicio, 800);
+            } else {
+                status.innerText = "ERROR DETECTADO";
+                status.className = "reaction-error";
+                rInput.value = "";
+                rInput.focus();
+            }
+        }
+
+        function pistaCambiarPregunta() {
+            const status = document.getElementById("status-display");
+            status.innerText = "REGENERANDO CÓDIGO...";
+            status.className = "reaction-info";
+            setTimeout(generarEjercicio, 500);
+        }
+
+        function pistaConsultarCompanero() {
+            alert("SISTEMA: Gira y pregunta a un compañero cómo resolver " + num1 + " x " + num2);
+        }
+
+        function pistaCambiarRoles() {
+            alert("SISTEMA: ¡Relevo! Pasale el dispositivo a un compañero para esta operación.");
+        }
+
+        function limpiarTodo() {
+            if(confirm("¿Seguro que quieres borrar todo tu progreso guardado?")) {
+                localStorage.removeItem('progresoMatematico');
+                progresoGuardado = [];
+                crearMatriz();
+                reiniciarLogica();
+                document.getElementById("status-display").innerText = "MEMORIA BORRADA";
+            }
+        }
+    </script>
+</body>
+</html>
+
+       
+      
