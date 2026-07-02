@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Semana de la Dulzura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Caveat:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #FBF1E0;
+    --cream-2: #F6E6CC;
+    --toffee: #C6763C;
+    --cacao: #3D2418;
+    --berry: #A23B56;
+    --butter: #F2C46D;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--cream);
+    color:var(--cacao);
+    font-family:'Nunito', sans-serif;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  h1,h2{font-family:'Fraunces', serif;}
+  .script{font-family:'Caveat', cursive;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    position:relative;
+    padding:2rem 1.5rem;
+    overflow:hidden;
+  }
+  .hero .eyebrow{
+    font-family:'Caveat', cursive;
+    font-size:clamp(1.3rem, 4vw, 1.8rem);
+    color:var(--berry);
+    margin-bottom:0.5rem;
+  }
+  .hero h1{
+    font-size:clamp(3.2rem, 14vw, 7rem);
+    font-weight:600;
+    font-style:italic;
+    line-height:0.95;
+    color:var(--cacao);
+  }
+  .hero p{
+    max-width:32ch;
+    margin:1.3rem auto 0;
+    font-size:1.05rem;
+    color:#6b4a34;
+  }
+  .scroll-cue{
+    margin-top:2.5rem;
+    font-family:'Caveat', cursive;
+    font-size:1.2rem;
+    color:var(--toffee);
+    animation:bob 2s ease-in-out infinite;
+  }
+  @keyframes bob{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(8px);}
+  }
+
+  /* floating candies in hero background */
+  .floaters{position:absolute; inset:0; pointer-events:none; z-index:0;}
+  .floater{
+    position:absolute;
+    width:22px; height:14px;
+    top:-40px;
+    opacity:0.55;
+    animation:drift linear infinite;
+  }
+  .floater::before, .floater::after{
+    content:'';
+    position:absolute;
+    top:50%;
+    width:0; height:0;
+    border-top:9px solid transparent;
+    border-bottom:9px solid transparent;
+  }
+  .floater::before{ left:-8px; border-right:10px solid var(--f-color); transform:translateY(-50%);}
+  .floater::after{ right:-8px; border-left:10px solid var(--f-color); transform:translateY(-50%);}
+  .floater .body{
+    position:absolute; inset:0;
+    background:var(--f-color);
+    border-radius:6px;
+  }
+  @keyframes drift{
+    0%{ transform:translateY(0) rotate(0deg); }
+    100%{ transform:translateY(110vh) rotate(180deg); }
+  }
+
+  /* ---------- INTRO ---------- */
+  .intro{
+    max-width:640px;
+    margin:0 auto;
+    padding:5rem 1.5rem;
+    text-align:center;
+  }
+  .intro h2{
+    font-size:clamp(1.8rem, 5vw, 2.6rem);
+    font-weight:400;
+    font-style:italic;
+    margin-bottom:1.2rem;
+  }
+  .intro p{
+    font-size:1.08rem;
+    line-height:1.7;
+    color:#5c4230;
+  }
+
+  /* ---------- CANDY BOX ---------- */
+  .box-section{
+    background:var(--cream-2);
+    padding:5rem 1.5rem 6rem;
+    border-top:1px solid rgba(61,36,24,0.08);
+    border-bottom:1px solid rgba(61,36,24,0.08);
+  }
+  .box-header{
+    text-align:center;
+    max-width:520px;
+    margin:0 auto 1rem;
+  }
+  .box-header h2{
+    font-size:clamp(1.8rem, 5vw, 2.4rem);
+    font-weight:400;
+    font-style:italic;
+  }
+  .box-header p{
+    margin-top:0.6rem;
+    color:#6b4a34;
+    font-size:0.98rem;
+  }
+  .counter{
+    text-align:center;
+    font-family:'Caveat', cursive;
+    font-size:1.4rem;
+    color:var(--berry);
+    margin-bottom:2.5rem;
+  }
+
+  .candy-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:1.6rem 1rem;
+    max-width:620px;
+    margin:0 auto;
+  }
+  @media (max-width:560px){
+    .candy-grid{grid-template-columns:repeat(3, 1fr); gap:1.4rem 0.6rem;}
+  }
+
+  .candy-slot{
+    perspective:800px;
+    aspect-ratio:1/1;
+  }
+  .candy-inner{
+    position:relative;
+    width:100%; height:100%;
+    transform-style:preserve-3d;
+    transition:transform 0.7s cubic-bezier(.4,.2,.2,1);
+    cursor:pointer;
+  }
+  .candy-slot.opened .candy-inner{
+    transform:rotateY(180deg);
+  }
+  .candy-face{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    backface-visibility:hidden;
+    border-radius:14px;
+  }
+  .candy-front{
+    background:transparent;
+  }
+  .candy-back{
+    transform:rotateY(180deg);
+    background:#fff;
+    border:1.5px solid rgba(61,36,24,0.12);
+    padding:0.6rem;
+    text-align:center;
+    box-shadow:0 6px 16px rgba(61,36,24,0.08);
+  }
+  .candy-back p{
+    font-family:'Caveat', cursive;
+    font-size:1.05rem;
+    line-height:1.25;
+    color:var(--cacao);
+  }
+
+  /* candy wrapper shape */
+  .candy{
+    position:relative;
+    width:62%;
+    height:38%;
+    border-radius:7px;
+    transition:transform 0.25s ease;
+  }
+  .candy-slot:not(.opened):hover .candy{ transform:scale(1.08) rotate(-3deg); }
+  .candy::before, .candy::after{
+    content:'';
+    position:absolute;
+    top:50%;
+    width:0; height:0;
+    border-top:15px solid transparent;
+    border-bottom:15px solid transparent;
+  }
+  .candy::before{ left:-13px; border-right:14px solid var(--c); transform:translateY(-50%);}
+  .candy::after{ right:-13px; border-left:14px solid var(--c); transform:translateY(-50%);}
+  .candy-body{
+    position:absolute; inset:0;
+    background:var(--c);
+    border-radius:7px;
+  }
+  .candy-body::after{
+    content:'';
+    position:absolute; inset:3px;
+    border:1.5px dashed rgba(255,255,255,0.45);
+    border-radius:5px;
+  }
+
+  /* ---------- LETTER ---------- */
+  .letter-section{
+    max-width:640px;
+    margin:0 auto;
+    padding:6rem 1.5rem;
+    text-align:center;
+  }
+  .letter-section h2{
+    font-size:clamp(1.8rem, 5vw, 2.4rem);
+    font-weight:400;
+    font-style:italic;
+    margin-bottom:1.5rem;
+  }
+  .open-letter-btn{
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:1rem;
+    background:var(--berry);
+    color:var(--cream);
+    border:none;
+    padding:0.9rem 2rem;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(162,59,86,0.25);
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .open-letter-btn:hover{ transform:translateY(-2px); box-shadow:0 12px 24px rgba(162,59,86,0.32); }
+  .open-letter-btn:focus-visible{ outline:3px solid var(--toffee); outline-offset:3px; }
+
+  .envelope{
+    max-width:480px;
+    margin:2.5rem auto 0;
+    text-align:left;
+    background:#fff;
+    border:1.5px solid rgba(61,36,24,0.12);
+    border-radius:16px;
+    padding:2.2rem 2rem;
+    box-shadow:0 14px 30px rgba(61,36,24,0.1);
+    display:none;
+    animation:unfold 0.5s ease;
+  }
+  .envelope.show{ display:block; }
+  @keyframes unfold{
+    from{ opacity:0; transform:translateY(14px) scale(0.98); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .envelope p{
+    font-family:'Caveat', cursive;
+    font-size:1.35rem;
+    line-height:1.6;
+    color:#4a2e1f;
+    margin-bottom:0.9rem;
+  }
+  .envelope .sign{
+    text-align:right;
+    font-size:1.5rem;
+    color:var(--berry);
+    margin-top:1.2rem;
+  }
+
+  footer{
+    text-align:center;
+    padding:3rem 1.5rem 4rem;
+    font-family:'Caveat', cursive;
+    font-size:1.2rem;
+    color:var(--toffee);
+  }
+
+  /* focus visibility for candy slots */
+  .candy-slot:focus-visible .candy-inner{ outline:3px solid var(--berry); outline-offset:4px; border-radius:14px; }
+</style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="floaters" id="floaters"></div>
+    <p class="eyebrow">feliz semana de la dulzura</p>
+    <h1>Marina</h1>
+    <p>Hice esto para vos: una cajita de dulces que en vez de azúcar tienen razones. Elegí uno.</p>
+    <p class="scroll-cue">deslizá ↓</p>
+  </section>
+
+  <section class="intro">
+    <h2 class="script" style="font-size:clamp(2rem,6vw,2.8rem);">Existe una semana oficial para esto,<br>pero conmigo aplica todo el año.</h2>
+    <p>Cada dulce de acá abajo esconde algo que pienso de vos. No hay ningún truco: solo tocalos, uno por uno, y andá leyendo. Al final hay algo más.</p>
+  </section>
+
+  <section class="box-section">
+    <div class="box-header">
+      <h2>La caja de dulzura</h2>
+      <p>Tocá cada dulce para desenvolverlo</p>
+    </div>
+    <p class="counter"><span id="count">0</span> de <span id="total">8</span> encontrados</p>
+    <div class="candy-grid" id="candyGrid"></div>
+  </section>
+
+  <section class="letter-section">
+    <h2 class="script" style="font-size:clamp(2rem,6vw,2.8rem);">Y por último...</h2>
+    <button class="open-letter-btn" id="openLetter">Abrir la carta</button>
+    <div class="envelope" id="envelope">
+      <p>Marina,</p>
+      <p>Si estás leyendo esto es porque encontraste el botón, o porque no aguantaste la curiosidad — cualquiera de las dos me hace sonreír igual.</p>
+      <p>Quería hacerte algo distinto para la semana de la dulzura, algo hecho con tiempo y no comprado apurado. Así que armé esto, línea por línea, pensando en vos en cada una.</p>
+      <p>La verdad es que no necesito una semana con nombre para pensar que sos lo más dulce que tengo. Pero ya que existe, la aprovecho para decírtelo en voz alta: te quiero, te elijo, y me encanta hacerlo todos los días.</p>
+      <p class="sign">Con todo mi cariño,<br>GASTÓN</p>
+    </div>
+  </section>
+
+  <footer>hecho a mano (bueno, a código) para vos 🍬</footer>
+
+<script>
+  // ---- floating candies in hero ----
+  const floaterColors = ['#A23B56', '#C6763C', '#F2C46D', '#8C4A2F'];
+  const floatersEl = document.getElementById('floaters');
+  const floaterCount = window.innerWidth < 560 ? 6 : 10;
+  for(let i=0;i<floaterCount;i++){
+    const f = document.createElement('div');
+    f.className = 'floater';
+    const color = floaterColors[i % floaterColors.length];
+    f.style.setProperty('--f-color', color);
+    f.style.left = (Math.random()*94 + 2) + '%';
+    const dur = 9 + Math.random()*8;
+    f.style.animationDuration = dur + 's';
+    f.style.animationDelay = (Math.random()*10) + 's';
+    const body = document.createElement('div');
+    body.className = 'body';
+    body.style.background = color;
+    f.appendChild(body);
+    floatersEl.appendChild(f);
+  }
+
+  // ---- candy box ----
+  const messages = [
+    "Adicto a lo dulce que me haces sentir.",
+    "Con vos hasta los días grises saben a algo rico.",
+    "Tu risa es mi golosina favorita, sin competencia.",
+    "Elegirte a vos, todos los días, es lo más fácil que hago.",
+    "Sos la parte dulce de mis días difíciles.",
+    "Contigo hasta el silencio es cómodo, y eso también es dulce.",
+    "Me gusta cómo hacés que lo simple se sienta especial.",
+    "Te quiero hoy, en la semana de la dulzura, y en todas las demás."
+  ];
+  const candyColors = ['#A23B56', '#C6763C', '#F2C46D', '#8C4A2F', '#B85C7A', '#D98C4A', '#E8B563', '#7A3B2E'];
+
+  const grid = document.getElementById('candyGrid');
+  const countEl = document.getElementById('count');
+  document.getElementById('total').textContent = messages.length;
+  let opened = 0;
+
+  messages.forEach((msg, i) => {
+    const slot = document.createElement('div');
+    slot.className = 'candy-slot';
+    slot.tabIndex = 0;
+    slot.setAttribute('role','button');
+    slot.setAttribute('aria-label', 'Desenvolver dulce ' + (i+1));
+
+    slot.innerHTML = `
+      <div class="candy-inner">
+        <div class="candy-face candy-front">
+          <div class="candy" style="--c:${candyColors[i]}">
+            <div class="candy-body"></div>
+          </div>
+        </div>
+        <div class="candy-face candy-back">
+          <p>${msg}</p>
+        </div>
+      </div>
+    `;
+
+    const open = () => {
+      if(!slot.classList.contains('opened')){
+        slot.classList.add('opened');
+        opened++;
+        countEl.textContent = opened;
+      }
+    };
+    slot.addEventListener('click', open);
+    slot.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(); }
+    });
+
+    grid.appendChild(slot);
+  });
+
+  // ---- letter ----
+  const btn = document.getElementById('openLetter');
+  const envelope = document.getElementById('envelope');
+  btn.addEventListener('click', () => {
+    envelope.classList.add('show');
+    btn.style.display = 'none';
+    envelope.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+</script>
+
+</body>
+</html>
